@@ -1,60 +1,113 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Remesas App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="manifest" href="manifest.json">
-  <style>
-    body { font-family: system-ui, sans-serif; margin: 0; padding: 1rem; background:#f5f5f5; }
-    h1 { font-size: 1.3rem; margin-bottom: 0.5rem; }
-    table { width: 100%; border-collapse: collapse; background: #fff; }
-    th, td { border: 1px solid #ddd; padding: 0.4rem; text-align: right; }
-    th { background: #eee; }
-    td input { width: 100%; box-sizing: border-box; text-align: right; border: none; outline: none; }
-    tfoot td { font-weight: bold; background:#fafafa; }
-    .btn { margin-top: 0.7rem; padding: 0.5rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
-    .btn-add { background:#007bff; color:#fff; }
-    .btn-del { background:#dc3545; color:#fff; padding:0.2rem 0.4rem; }
-    .summary { margin-top: 0.8rem; background:#fff; padding:0.6rem; border-radius:4px; }
-    .label { font-weight:bold; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remesas Pro - Calculadora</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #059669;
+            --bg: #f8fafc;
+            --text-main: #1e293b;
+            --card-bg: #ffffff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container { 
+            width: 100%;
+            max-width: 480px; 
+            background: var(--card-bg); 
+            padding: 24px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        h2 { text-align: center; margin-bottom: 24px; font-weight: 700; color: var(--primary); }
+
+        .form-grid { display: flex; gap: 12px; margin-bottom: 16px; }
+        .input-group { flex: 1; }
+        label { display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; color: #64748b; }
+        
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            transition: all 0.2s;
+            background: #fdfdfd;
+        }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .btn-add { background: var(--primary); color: white; margin-bottom: 12px; }
+        .btn-add:active { transform: scale(0.98); }
+        .btn-clear { background: transparent; color: #94a3b8; font-size: 0.85rem; }
+
+        .stats-card { 
+            background: #1e293b; 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin: 20px 0;
+        }
+        .stat-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.9; }
+        .stat-main { border-top: 1px solid #334155; padding-top: 12px; margin-top: 12px; font-size: 1.2rem; font-weight: 700; color: #38bdf8; }
+
+        .table-container { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { text-align: left; padding: 12px 8px; color: #64748b; border-bottom: 2px solid #f1f5f9; font-size: 0.75rem; }
+        td { padding: 12px 8px; border-bottom: 1px solid #f1f5f9; }
+    </style>
 </head>
 <body>
-  <h1>Calculadora de Remesas</h1>
 
-  <table id="tabla">
-    <thead>
-      <tr>
-        <th style="text-align:left;">#</th>
-        <th>Cant USD</th>
-        <th>Tasa (CUP/USD)</th>
-        <th>Total CUP</th>
-        <th>Acción</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-    <tfoot>
-      <tr>
-        <td style="text-align:left;">Totales:</td>
-        <td id="totalUsd">0.00</td>
-        <td></td>
-        <td id="totalCup">0.00</td>
-        <td></td>
-      </tr>
-    </tfoot>
-  </table>
+<div class="container">
+    <h2>Remesas Pro</h2>
+    
+    <div class="form-grid">
+        <div class="input-group">
+            <label>Monto USD</label>
+            <input type="number" id="usd" placeholder="0.00" step="any">
+        </div>
+        <div class="input-group">
+            <label>Tasa CUP</label>
+            <input type="number" id="tasa" placeholder="0.00" step="any">
+        </div>
+    </div>
+    
+    <button class="btn btn-add" id="addBtn">Añadir Registro</button>
 
-  <button class="btn btn-add" onclick="agregarFila()">Agregar remesa</button>
+    <div class="stats-card">
+        <div class="stat-line"><span>Total USD:</span> <span id="totalUsd">0.00</span></div>
+        <div class="stat-line"><span>Total CUP:</span> <span id="totalCup">0.00</span></div>
+        <div class="stat-line stat-main"><span>Promedio:</span> <span id="avgRate">0.00</span></div>
+    </div>
 
-  <div class="summary">
-    <div><span class="label">Promedio ponderado de tasa:</span> <span id="promedio">0.00</span> CUP/USD</div>
-  </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
 
     function agregarFila(usd = "", tasa = "") {
       const tbody = document.getElementById("tbody");
