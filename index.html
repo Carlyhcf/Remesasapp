@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Remesas App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 1rem; background:#f5f5f5; }
+    h1 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { border: 1px solid #ddd; padding: 0.4rem; text-align: right; }
+    th { background: #eee; }
+    td input { width: 100%; box-sizing: border-box; text-align: right; border: none; outline: none; }
+    tfoot td { font-weight: bold; background:#fafafa; }
+    .btn { margin-top: 0.7rem; padding: 0.5rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-add { background:#007bff; color:#fff; }
+    .btn-del { background:#dc3545; color:#fff; padding:0.2rem 0.4rem; }
+    .summary { margin-top: 0.8rem; background:#fff; padding:0.6rem; border-radius:4px; }
+    .label { font-weight:bold; }
+  </style>
+</head>
+<body>
+  <h1>Calculadora de Remesas</h1>
+
+  <table id="tabla">
+    <thead>
+      <tr>
+        <th style="text-align:left;">#</th>
+        <th>Cant USD</th>
+        <th>Tasa (CUP/USD)</th>
+        <th>Total CUP</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+    <tfoot>
+      <tr>
+        <td style="text-align:left;">Totales:</td>
+        <td id="totalUsd">0.00</td>
+        <td></td>
+        <td id="totalCup">0.00</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <button class="btn btn-add" onclick="agregarFila()">Agregar remesa</button>
+
+  <div class="summary">
+    <div><span class="label">Promedio ponderado de tasa:</span> <span id="promedio">0.00</span> CUP/USD</div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+
+    function agregarFila(usd = "", tasa = "") {
+      const tbody = document.getElementById("tbody");
+      const fila = document.createElement("tr");
+
+      const cIndex = document.createElement("td");
+      cIndex.style.textAlign = "left";
+      cIndex.textContent = tbody.children.length + 1;
+
+      const cUsd = document.createElement("td");
+      const inputUsd = document.createElement("input");
+      inputUsd.type = "number";
+      inputUsd.step = "0.01";
+      inputUsd.value = usd;
+      inputUsd.oninput = recalcular;
+      cUsd.appendChild(inputUsd);
+
+      const cTasa = document.createElement("td");
+      const inputTasa = document.createElement("input");
+      inputTasa.type = "number";
+      inputTasa.step = "0.01";
+      inputTasa.value = tasa;
+      inputTasa.oninput = recalcular;
+      cTasa.appendChild(inputTasa);
+
+      const cTotal = document.createElement("td");
+      cTotal.className = "total-cup";
+      cTotal.textContent = "0.00";
+
+      const cAccion = document.createElement("td");
+      const btnDel = document.createElement("button");
+      btnDel.textContent = "X";
+      btnDel.className = "btn-del";
+      btnDel.onclick = () => { fila.remove(); renumerar(); recalcular(); };
+      cAccion.appendChild(btnDel);
+
+      fila.appendChild(cIndex);
+      fila.appendChild(cUsd);
+      fila.appendChild(cTasa);
+      fila.appendChild(cTotal);
+      fila.appendChild(cAccion);
+
+      tbody.appendChild(fila);
+      recalcular();
+    }
+
+    function renumerar() {
+      const filas = document.querySelectorAll("#tbody tr");
+      filas.forEach((tr, i) => tr.children[0].textContent = i + 1);
+    }
+
+    function recalcular() {
+      const filas = document.querySelectorAll("#tbody tr");
+      let sumaUsd = 0;
+      let sumaCup = 0;
+      let sumaUsdPorTasa = 0;
+
+      filas.forEach(tr => {
+        const usd = parseFloat(tr.children[1].querySelector("input").value) || 0;
+        const tasa = parseFloat(tr.children[2].querySelector("input").value) || 0;
+        const totalCup = usd * tasa;
+
+        tr.children[3].textContent = totalCup.toFixed(2);
+
+        sumaUsd += usd;
+        sumaCup += totalCup;
+        sumaUsdPorTasa += usd * tasa;
+      });
+
+      document.getElementById("totalUsd").textContent = sumaUsd.toFixed(2);
+      document.getElementById("totalCup").textContent = sumaCup.toFixed(2);
+
+      const promedio = sumaUsd > 0 ? (sumaUsdPorTasa / sumaUsd) : 0;
+      document.getElementById("promedio").textContent = promedio.toFixed(2);
+    }
+  </script>
+</body>
+      </html>
