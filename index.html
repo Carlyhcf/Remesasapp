@@ -2,59 +2,87 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>LocalStorage GitHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemesasApp</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f2f2f2;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .item {
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #007bff;
+        }
+
+        .item button {
+            background: red;
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body>
 
-<h2>Prueba de guardado en GitHub Pages</h2>
+    <h2>RemesasApp</h2>
 
-<label>Monto:</label>
-<input id="monto" type="number">
+    <div class="card">
+        <label>Monto (USD):</label>
+        <input id="monto" type="number" placeholder="Escribe el monto">
 
-<br><br>
+        <label>Tasa (CUP):</label>
+        <input id="tasa" type="number" placeholder="Escribe la tasa">
 
-<label>Tasa:</label>
-<input id="tasa" type="number">
+        <h3>Resultado: <span id="resultado">0</span> CUP</h3>
 
-<br><br>
+        <button onclick="agregar()">Agregar al historial</button>
+        <button style="background:#444" onclick="borrarTodo()">Borrar todo</button>
+    </div>
 
-<p>Resultado: <span id="resultado">0</span></p>
+    <h3>Historial</h3>
+    <div id="historial"></div>
 
-<script>
-    // Cargar datos al abrir la página
-    document.addEventListener("DOMContentLoaded", () => {
-        const monto = localStorage.getItem("monto");
-        const tasa = localStorage.getItem("tasa");
-
-        if (monto !== null) document.getElementById("monto").value = monto;
-        if (tasa !== null) document.getElementById("tasa").value = tasa;
-
-        calcular();
-    });
-
-    // Guardar al escribir
-    document.getElementById("monto").addEventListener("input", function () {
-        localStorage.setItem("monto", this.value);
-        calcular();
-    });
-
-    document.getElementById("tasa").addEventListener("input", function () {
-        localStorage.setItem("tasa", this.value);
-        calcular();
-    });
-
-    // Función de cálculo
-    function calcular() {
-        const monto = parseFloat(document.getElementById("monto").value) || 0;
-        const tasa = parseFloat(document.getElementById("tasa").value) || 0;
-
-        const resultado = monto * tasa;
-
-        document.getElementById("resultado").textContent = resultado.toFixed(2);
-
-        localStorage.setItem("resultado", resultado);
-    }
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
